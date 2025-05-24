@@ -8,9 +8,14 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/Rabbidking/pokedex/internal/pokecache"
 )
 
 const baseLocationAreaURL = "https://pokeapi.co/api/v2/location-area/"
+
+var cache = pokecache.NewCache(time.Duration(10 * time.Second))
 
 type cliCommand struct {
 	name        string
@@ -21,7 +26,7 @@ type cliCommand struct {
 type config struct {
 	//store next and previous URLs
 	Next     *string `json:"next"`
-	Previous *string `json"previous"`
+	Previous *string `json:"previous"`
 }
 
 type locationArea struct {
@@ -79,22 +84,32 @@ func commandHelp(cfg *config) error {
 func fetchAndPrintLocations(url string, cfg *config) error {
 	//Fetch data from URL, unmarshal the JSON response into our struct, print each result, update cfg.Next and cfg.Previous, and return any errors
 	var pokeResp pokeAPIResponse
+	var data []byte
+	var err error
 
-	//Fetch the desired URL
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
+	//check if data from url is already in our cache
+	data, ok := cache.Get(url)
+	if !ok {
+		//fetch from http.Get, since it's not in our cache
+		resp, err := http.Get(url)
 
-	//read the body of the URL
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+
+		//read body as []byte
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		data = body
+		cache.Add(url, data)
+
 	}
 
 	//Unmarshal the JSON into our struct
-	err = json.Unmarshal(body, &pokeResp)
+	err = json.Unmarshal(data, &pokeResp)
 	if err != nil {
 		return err
 	}
