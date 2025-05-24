@@ -32,7 +32,7 @@ type locationArea struct {
 type pokeAPIResponse struct {
 	Count    int            `json:"count"`
 	Next     *string        `json:"next"`
-	Previous *string        `json"previous"`
+	Previous *string        `json:"previous"`
 	Results  []locationArea `json:"results"`
 }
 
