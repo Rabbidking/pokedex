@@ -62,6 +62,11 @@ var commandRegistry = map[string]cliCommand{
 		description: "Displays the names of the previous 20 locations",
 		callback:    commandMapb,
 	},
+	"explore": {
+		name:        "explore",
+		description: "View list of all Pokemon at a given location",
+		callback:    commandExplore,
+	},
 }
 
 func commandExit(cfg *config) error {
@@ -150,6 +155,10 @@ func commandMapb(cfg *config) error {
 	}
 
 	return fetchAndPrintLocations(*cfg.Previous, cfg)
+}
+
+func commandExplore(cfg *config, locationName string) error {
+
 }
 
 func cleanInput(text string) []string {
