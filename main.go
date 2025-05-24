@@ -71,6 +71,8 @@ func commandHelp(cfg *config) error {
 	fmt.Print("\n")
 	fmt.Println("help: Displays a help message")
 	fmt.Println("exit: Exit the Pokedex")
+	fmt.Println("map: display the names of the next 20 locations")
+	fmt.Println("mapb: display the previous 20 locations")
 	return nil
 }
 
